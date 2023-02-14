@@ -90,7 +90,7 @@ exports.getRecord = async(req, res) => {
         })
         .then(catzonageografica => {
             if (!catzonageografica) {
-                return res.status(404).send({ message: "Catzonageografica Not found." });
+                return res.status(200).send({ message: "Catzonageografica Not found." });
             }
 
             res.status(200).send(catzonageografica);
@@ -109,7 +109,7 @@ exports.getCatalogo = async(req, res) => {
             ]
         }).then(catzonageografica => {
             if (!catzonageografica) {
-                return res.status(404).send({ message: "Catzonageografica Not found." });
+                return res.status(200).send({ message: "Catzonageografica Not found." });
             }
 
             res.status(200).send(catzonageografica);
@@ -128,7 +128,7 @@ exports.getCatalogoOpen = async(req, res) => {
             ]
         }).then(catzonageografica => {
             if (!catzonageografica) {
-                return res.status(404).send({ message: "Catzonageografica Not found." });
+                return res.status(200).send({ message: "Catzonageografica Not found." });
             }
 
             res.status(200).send(catzonageografica);

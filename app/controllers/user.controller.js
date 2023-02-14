@@ -97,7 +97,7 @@ exports.getCatalogo = async(req, res) => {
             ]
         }).then(user => {
             if (!user) {
-                return res.status(404).send({ message: "User Not found." });
+                return res.status(200).send({ message: "User Not found." });
             }
 
             res.status(200).send(user);
@@ -117,7 +117,7 @@ exports.getRecord = async(req, res) => {
         })
         .then(user => {
             if (!user) {
-                return res.status(404).send({ message: "User Not found." });
+                return res.status(200).send({ message: "User Not found." });
             }
             user.pass = '';
             res.status(200).send(user);
@@ -164,7 +164,7 @@ exports.getRecordUsuariosZonas = async(req, res) => {
         })
         .then(usuarios_zonas => {
             if (!usuarios_zonas) {
-                return res.status(404).send({ message: "Usuarios_zonas Not found." });
+                return res.status(200).send({ message: "Usuarios_zonas Not found." });
             }
             res.status(200).send(usuarios_zonas);
         })

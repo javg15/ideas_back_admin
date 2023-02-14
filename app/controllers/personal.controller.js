@@ -93,7 +93,7 @@ exports.getRecord = async(req, res) => {
         })
         .then(personal => {
             /*if (!personal) {
-                return res.status(404).send({ message: "Personal Not found." });
+                return res.status(200).send({ message: "Personal Not found." });
             }*/
 
             res.status(200).send(personal);
@@ -112,7 +112,7 @@ exports.getRecordSegunUsuario = async(req, res) => {
         })
         .then(personal => {
             if (!personal) {
-                return res.status(404).send({ message: "Personal Not found." });
+                return res.status(200).send({ message: "Personal Not found." });
             }
 
             res.status(200).send(personal);
@@ -581,7 +581,7 @@ exports.getCatalogo = async(req, res) => {
             ]
         }).then(personal => {
             if (!personal) {
-                return res.status(404).send({ message: "Personal Not found." });
+                return res.status(200).send({ message: "Personal Not found." });
             }
 
             res.status(200).send(personal);
@@ -618,7 +618,7 @@ exports.getCatalogoSegunBusqueda = async(req, res) => {
                 ]
             }).then(personal => {
                 if (!personal) {
-                    return res.status(404).send({ message: "Personal Not found." });
+                    return res.status(200).send({ message: "Personal Not found." });
                 }
 
                 res.status(200).send(personal);

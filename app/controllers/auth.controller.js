@@ -8,42 +8,70 @@ var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
 exports.signup = (req, res) => {
+    const param = {};
+    param.username=req.body.request.user
+    param.password=req.body.request.pass
+    param.email=req.body.request.email
     // Save User to Database
-    /*User.create({
-            username: req.body.username,
-            email: req.body.email,
-            pass: bcrypt.hashSync(req.body.password, 8)
+    User.create({
+            username: param.username,
+            email: param.email,
+            pass: bcrypt.hashSync(param.password, 8)
         })
         .then(user => {
-            res.send({ message: "User was registered successfully!" });
+            res.send({ 
+                codigo:"00400",
+                mensaje: "Usuario registrado correctamente",
+                response: {
+                }
+             });
         })
         .catch(err => {
-            res.status(500).send({ message: err.message });
-        });*/
-        res.send({ message: "User was registered successfully!" });
+            let mensaje="";
+            if(err.original.code=="23505")
+                mensaje="El nombre de usuario ya existe"
+                
+            res.status(200).send({ 
+                codigo:"00400",
+                mensaje: mensaje,
+                response: {
+                }
+             });
+        });
 };
 
 exports.signin = (req, res) => {
+    const param = {};
+    param.username=req.body.request.user
+    param.password=req.body.request.pass
+    
     User.findOne({
             where: {
-                username: req.body.username
+                username: param.username
             }
         })
         .then(user => {
             if (!user) {
-                return res.status(404).send({ message: "User Not found." });
+                return res.status(200).send({ 
+                        codigo:"00400",
+                        mensaje: "Usuario no registrado",
+                        response: {
+                        }
+                     });
             }
 
             var passwordIsValid = bcrypt.compareSync(
-                req.body.password,
+                param.password,
                 user.pass
             );
 
             if (!passwordIsValid) {
-                return res.status(401).send({
-                    accessToken: null,
-                    message: "Contraseña inválida!"
-                });
+                return res.status(200).send({ 
+                    codigo:"00400",
+                    mensaje: "Contraseña inválida",
+                    response: {
+                    }
+                 });
             }
 
             var token = jwt.sign({ id: user.id }, config.secret, {
@@ -54,15 +82,27 @@ exports.signin = (req, res) => {
             /*for (let i = 0; i < roles.length; i++) {
                 authorities.push("ROLE_" + roles[i].name.toUpperCase());
             }*/
-            res.status(200).send({
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                roles: authorities,
-                accessToken: token
-            });
+            res.status(200).send(
+                { 
+                    codigo:"00200",
+                    mensaje: "Usuario válido",
+                    response: {
+                        id: user.id,
+                        username: user.username,
+                        email: user.email,
+                        roles: authorities,
+                        accessToken: token
+                    }
+                }
+            );
         })
         .catch(err => {
-            res.status(500).send({ message: err.message });
+            res.status(200).send(
+                { 
+                    codigo:"00500",
+                    mensaje: err.mensaje,
+                    response: {
+                    }
+                 });
         });
 };

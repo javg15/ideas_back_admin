@@ -98,7 +98,7 @@ exports.getRecord = async(req, res) => {
         })
         .then(usuariossistemas => {
             if (!usuariossistemas) {
-                return res.status(404).send({ message: "Usuariossistemas Not found." });
+                return res.status(200).send({ message: "Usuariossistemas Not found." });
             }
 
             res.status(200).send(usuariossistemas);

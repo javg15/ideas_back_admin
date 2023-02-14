@@ -220,7 +220,7 @@ exports.getRecordReferencia = async(req, res) => {
             }
         }).then(archivo => {
             if (!archivo) {
-                return res.status(404).send({ message: "archivo Not found." });
+                return res.status(200).send({ message: "archivo Not found." });
             }
 
             res.status(200).send(archivo);
@@ -256,7 +256,7 @@ exports.getAvatar = async(req, res) => {
     if (datos.length > 0)
         res.status(200).send(datos);
     else
-        return res.status(404).send({ message: "Avatar no encontrado." });
+        return res.status(200).send({ message: "Avatar no encontrado." });
 }
 
 //Actualiza solo los campos de referencia externa

@@ -90,7 +90,7 @@ exports.getRecord = async(req, res) => {
         })
         .then(catsistemas => {
             if (!catsistemas) {
-                return res.status(404).send({ message: "Catsistemas Not found." });
+                return res.status(200).send({ message: "Catsistemas Not found." });
             }
 
             res.status(200).send(catsistemas);
@@ -109,7 +109,7 @@ exports.getCatalogo = async(req, res) => {
             ]
         }).then(catsistemas => {
             if (!catsistemas) {
-                return res.status(404).send({ message: "Catsistemas Not found." });
+                return res.status(200).send({ message: "Catsistemas Not found." });
             }
 
             res.status(200).send(catsistemas);
@@ -128,7 +128,7 @@ exports.getCatalogoOpen = async(req, res) => {
             ]
         }).then(catsistemas => {
             if (!catsistemas) {
-                return res.status(404).send({ message: "Catsistemas Not found." });
+                return res.status(200).send({ message: "Catsistemas Not found." });
             }
 
             res.status(200).send(catsistemas);

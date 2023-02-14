@@ -95,7 +95,7 @@ exports.getRecord = async(req, res) => {
         })
         .then(permgrupos => {
             if (!permgrupos) {
-                return res.status(404).send({ message: "Permgrupos Not found." });
+                return res.status(200).send({ message: "Permgrupos Not found." });
             }
 
             res.status(200).send(permgrupos);
@@ -119,7 +119,7 @@ exports.getCatalogo = async(req, res) => {
             ]
         }).then(permgrupos => {
             if (!permgrupos) {
-                return res.status(404).send({ message: "Permgrupos Not found." });
+                return res.status(200).send({ message: "Permgrupos Not found." });
             }
 
             res.status(200).send(permgrupos);
@@ -149,7 +149,7 @@ exports.getCatalogoSegunSistema = async(req, res) => {
             ]
         }).then(permgrupos => {
             if (!permgrupos) {
-                return res.status(404).send({ message: "Permgrupos Not found." });
+                return res.status(200).send({ message: "Permgrupos Not found." });
             }
 
             res.status(200).send(permgrupos);
