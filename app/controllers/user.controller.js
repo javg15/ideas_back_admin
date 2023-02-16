@@ -174,7 +174,10 @@ exports.getRecordUsuariosZonas = async(req, res) => {
 }
 
 exports.getMenu = async(req, res) => {
-    let query = "select adm.fn_menu_usuario(:id_usuarios,0,'adm') as menu";
+    const param = {};
+    param.id_usuarios=req.body.request.id_usuarios
+
+    let query = "select adm.fn_menu_usuario(:id_usuarios,0,'simulador',0) as menu";
 
     datos = await db.sequelize.query(query, {
         // A function (or false) for logging your queries
@@ -183,7 +186,7 @@ exports.getMenu = async(req, res) => {
         logging: console.log,
 
         replacements: {
-            id_usuarios: req.body.id,
+            id_usuarios: param.id_usuarios,
         },
         // If plain is true, then sequelize will only return the first
         // record of the result set. In case of false it will return all records.
@@ -193,7 +196,15 @@ exports.getMenu = async(req, res) => {
         raw: true,
         type: QueryTypes.SELECT
     });
-    res.status(200).send(datos[0]["menu"]);
+    res.status(200).send(
+        { 
+            codigo:"00400",
+            mensaje: "",
+            response: {
+                datos:datos[0]["menu"]
+            }
+         }
+        );
 }
 
 exports.getTreePermisos = async(req, res) => {

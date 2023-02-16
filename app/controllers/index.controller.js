@@ -1,5 +1,6 @@
 const ctrl = {};
 ctrl.auth = require("../controllers/auth.controller.js");
+ctrl.user = require("../controllers/user.controller.js");
 
 exports.index = (req, res) => {
     /*{
@@ -18,6 +19,15 @@ exports.index = (req, res) => {
     switch(req.body.accion.toLowerCase()){
         case "signup": ctrl.auth.signup(req, res); break;
         case "signin": ctrl.auth.signin(req, res); break;
+        case "getmenu": ctrl.user.getMenu(req, res); break;
+        default:res.status(200).send(
+            { 
+                codigo:"00100",
+                mensaje: "no existe el metodo",
+                response: {
+                }
+             }
+            )
     }
     
 };
