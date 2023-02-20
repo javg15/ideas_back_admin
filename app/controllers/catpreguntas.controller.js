@@ -124,7 +124,7 @@ exports.getCuestionario = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select cp.id,cp.estructura "
+    query = "select cp.id,cp.estructura,cs.estructura as seccion  "
     + "from catpreguntas cp "
     + "    left join catseccioncuest cs on cp.id_catseccioncuest=cs.id "
     + "where cs.id_cuestionario =:id_cuestionario and cp.state IN('A','B') "
