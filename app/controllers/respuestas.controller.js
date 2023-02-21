@@ -1,6 +1,6 @@
 const db = require("../models");
 const mensajesValidacion = require("../config/validate.config");
-const Catpreguntas = db.catpreguntas;
+const Respuestas = db.respuestas;
 
 const { QueryTypes } = require('sequelize');
 let Validator = require('fastest-validator');
@@ -16,7 +16,7 @@ exports.getAdmin = async(req, res) => {
         query = "";
 
     if (req.body.solocabeceras == 1) {
-        query = "SELECT * FROM s_catpreguntas_mgr('&modo=10&id_usuario=:id_usuario')"; //el modo no existe, solo es para obtener un registro
+        query = "SELECT * FROM s_respuestas_mgr('&modo=10&id_usuario=:id_usuario')"; //el modo no existe, solo es para obtener un registro
 
         datos = await db.sequelize.query(query, {
             replacements: {
@@ -27,7 +27,7 @@ exports.getAdmin = async(req, res) => {
             type: QueryTypes.SELECT
         });
     } else {
-        query = "SELECT * FROM s_catpreguntas_mgr('" +
+        query = "SELECT * FROM s_respuestas_mgr('" +
             "&modo=0&id_usuario=:id_usuario" +
             "&inicio=:start&largo=:length" +
             "&scampo=" + req.body.opcionesAdicionales.datosBusqueda.campo + "&soperador=" + req.body.opcionesAdicionales.datosBusqueda.operador + "&sdato=" + req.body.opcionesAdicionales.datosBusqueda.valor +
@@ -80,55 +80,20 @@ exports.getAdmin = async(req, res) => {
     // res.status(500).send({ message: err.message });
 }
 
-
-exports.getRecord = async(req, res) => {
-
-    Catpreguntas.findOne({
-            where: {
-                sistema: req.body.sistema
-            }
-        })
-        .then(catpreguntas => {
-            if (!catpreguntas) {
-                return res.status(200).send({ message: "Catpreguntas Not found." });
-            }
-
-            res.status(200).send(catpreguntas);
-        })
-        .catch(err => {
-            res.status(500).send({ message: err.message });
-        });
-}
-
-exports.getCatalogo = async(req, res) => {
-
-    Catpreguntas.findAll({
-            attributes: ['sistema', ['sistema', 'text']],
-            order: [
-                ['sistema', 'ASC'],
-            ]
-        }).then(catpreguntas => {
-            if (!catpreguntas) {
-                return res.status(200).send({ message: "Catpreguntas Not found." });
-            }
-
-            res.status(200).send(catpreguntas);
-        })
-        .catch(err => {
-            res.status(500).send({ message: err.message });
-        });
-}
-
-exports.getCuestionario = async(req, res) => {
+exports.getRegistros = async(req, res) => {
 
     let datos = "",
     query = "";
 
-    query = "select cp.id,cp.estructura,cs.estructura as seccion  "
-    + "from catpreguntas cp "
-    + "    left join catseccioncuest cs on cp.id_catseccioncuest=cs.id "
-    + "where cs.id_cuestionario =:id_cuestionario and cp.state IN('A','B') "
-    + "order by cp.id_catseccioncuest, cp.orden ";
+    query = "SELECT r.id,r.respuestas "
+    + "FROM proyectos as p "
+    + "    left join respuestas r on p.id =r.id_proyectos "
+    + "    left join catpreguntas c on r.id_catpreguntas =c.id "
+    + "    left join catseccioncuest cs on c.id_catseccioncuest =cs.id  "
+    + "WHERE p.id_usuarios = :id_usuarios "
+    + "    and p.id =:id_proyectos "
+    + "    and cs.id_cuestionario =:id_cuestionario "
+    + "    and p.state IN('A','B')";
 
     datos = await db.sequelize.query(query, {
         // A function (or false) for logging your queries
@@ -137,7 +102,9 @@ exports.getCuestionario = async(req, res) => {
         logging: console.log,
 
         replacements: {
-            id_cuestionario: req.body.request.id_cuestionario,
+            id_usuarios: req.body.request.id_usuarios,
+            id_proyectos: req.body.request.id_proyectos,
+            id_cuestionario: req.body.request.id_cuestionario
         },
         // If plain is true, then sequelize will only return the first
         // record of the result set. In case of false it will return all records.
@@ -150,36 +117,36 @@ exports.getCuestionario = async(req, res) => {
 
 
     //console.log(JSON.stringify(respuesta));
-    res.status(200).send( { 
+    res.status(200).send({ 
         codigo:"00200",
         mensaje: "",
         response: {
                     datos
                 }
-            }
-        );
+            });
     //return res.status(200).json(data);
     // res.status(500).send({ message: err.message });
 }
 
 exports.setRecord = async(req, res) => {
-    Object.keys(req.body.dataPack).forEach(function(key) {
+    Object.keys(req.body.request.dataPack).forEach(function(key) {
         if (key.indexOf("id_", 0) >= 0) {
-            if (req.body.dataPack[key] != '')
-                req.body.dataPack[key] = parseInt(req.body.dataPack[key]);
+            if (req.body.request.dataPack[key] != '')
+                req.body.request.dataPack[key] = parseInt(req.body.request.dataPack[key]);
         }
     })
 
     /* customer validator shema */
     const dataVSchema = {
-        
-        
+        /*first_name: { type: "string", min: 1, max: 50, pattern: namePattern },*/
+
+        sistema: { type: "string", min: 2, max: 2 },
     };
 
     var vres = true;
-    if (req.body.actionForm.toUpperCase() == "NUEVO" ||
-        req.body.actionForm.toUpperCase() == "EDITAR") {
-        vres = await dataValidator.validate(req.body.dataPack, dataVSchema);
+    if (req.body.request.actionForm.toUpperCase() == "NUEVO" ||
+        req.body.request.actionForm.toUpperCase() == "EDITAR") {
+        vres = await dataValidator.validate(req.body.request.dataPack, dataVSchema);
     }
 
     /* validation failed */
@@ -193,17 +160,87 @@ exports.setRecord = async(req, res) => {
             errors[item.field] = item.message;
         }
 
-        res.status(200).send({ 
-            codigo:"00400",
-            mensaje: errors,
-            response: {
-                    }
-        });
+        res.status(200).send(
+            { 
+                codigo:"00400",
+                mensaje: errors,
+                response: {
+                        }
+            });
         return;
         /*throw {
             name: "ValidationError",
             message: errors
         };*/
     }
-    res.status(200).send("Created");
+
+    //buscar si existe el registro
+    Respuestas.findOne({
+            where: {
+                [Op.and]: [{ id: req.body.request.dataPack.id }, {
+                    id: {
+                        [Op.gt]: 0
+                    }
+                }],
+            }
+        })
+        .then(respuestas => {
+            if (!respuestas) {
+                delete req.body.request.dataPack.id;
+                delete req.body.request.dataPack.created_at;
+                delete req.body.request.dataPack.updated_at;
+                req.body.request.dataPack.id_usuarios_r = req.userId;
+                req.body.request.dataPack.state = globales.GetStatusSegunAccion(req.body.request.actionForm);
+
+                Respuestas.create(
+                    req.body.request.dataPack
+                ).then((self) => {
+                    // here self is your instance, but updated
+                    res.status(200).send(
+                        { 
+                            codigo:"00200",
+                            mensaje: "",
+                            response: {
+                                        id: self.id,
+                                    }
+                        })
+                }).catch(err => {
+                    res.status(200).send(
+                        { 
+                            codigo:"00400",
+                            mensaje: err,
+                            response: {
+                                    }
+                        });
+                });
+            } else {
+                delete req.body.request.dataPack.created_at;
+                delete req.body.request.dataPack.updated_at;
+                req.body.request.dataPack.id_usuarios_r = req.userId;
+                req.body.request.dataPack.state = globales.GetStatusSegunAccion(req.body.request.actionForm);
+
+                respuestas.update(req.body.request.dataPack).then((self) => {
+                    // here self is your instance, but updated
+                    res.status(200).send(
+                        { 
+                            codigo:"00200",
+                            mensaje: "",
+                            response: {
+                                        id: self.id,
+                                    }
+                        })
+                });
+            }
+
+
+        })
+        .catch(err => {
+            res.status(200).send(
+                { 
+                    codigo:"00400",
+                    mensaje: err.message,
+                    response: {
+                            }
+                });
+        });
 }
