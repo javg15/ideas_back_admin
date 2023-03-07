@@ -142,7 +142,7 @@ exports.setCuestionario = async(req, res) => {
             "id_usuarios":id_usuarios,
             "id_proyectos":id_proyectos,
             "id_catpreguntas":resArr[i].id_catpreguntas,
-            "respuesta":resArr[i].respuesta,
+            "respuesta":JSON.stringify(resArr[i].respuesta),
         }
         this.setRecord(dataPack)
     }
