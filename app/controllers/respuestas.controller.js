@@ -1,6 +1,8 @@
 const db = require("../models");
+const globales = require("../config/global.config");
 const mensajesValidacion = require("../config/validate.config");
 const Respuestas = db.respuestas;
+const Op = db.Sequelize.Op;
 
 const { QueryTypes } = require('sequelize');
 let Validator = require('fastest-validator');
@@ -128,26 +130,51 @@ exports.getRegistros = async(req, res) => {
     // res.status(500).send({ message: err.message });
 }
 
-exports.setRecord = async(req, res) => {
-    Object.keys(req.body.request.dataPack).forEach(function(key) {
+exports.setCuestionario = async(req, res) => {
+
+    const resArr=req.body.request.respuestas
+    const id_proyectos=req.body.request.id_proyectos
+    const id_usuarios=req.body.id_usuarios
+    let dataPack=""; 
+
+    for(let i=0;i<resArr.length;i++){
+        dataPack={
+            "id_usuarios":id_usuarios,
+            "id_proyectos":id_proyectos,
+            "id_catpreguntas":resArr[i].id_catpreguntas,
+            "respuesta":resArr[i].respuesta,
+        }
+        this.setRecord(dataPack)
+    }
+
+     //console.log(JSON.stringify(respuesta));
+    res.status(200).send( { 
+        codigo:"00200",
+        mensaje: "",
+        response: {
+                   
+                }
+            }
+        );
+    //return res.status(200).json(data);
+    // res.status(500).send({ message: err.message });
+}
+
+exports.setRecord = async(dataPack) => {
+    Object.keys(dataPack).forEach(function(key) {
         if (key.indexOf("id_", 0) >= 0) {
-            if (req.body.request.dataPack[key] != '')
-                req.body.request.dataPack[key] = parseInt(req.body.request.dataPack[key]);
+            if (dataPack[key] != '')
+                dataPack[key] = parseInt(dataPack[key]);
         }
     })
 
     /* customer validator shema */
     const dataVSchema = {
         /*first_name: { type: "string", min: 1, max: 50, pattern: namePattern },*/
-
-        sistema: { type: "string", min: 2, max: 2 },
     };
 
     var vres = true;
-    if (req.body.request.actionForm.toUpperCase() == "NUEVO" ||
-        req.body.request.actionForm.toUpperCase() == "EDITAR") {
-        vres = await dataValidator.validate(req.body.request.dataPack, dataVSchema);
-    }
+    vres = await dataValidator.validate(dataPack, dataVSchema);
 
     /* validation failed */
     if (!(vres === true)) {
@@ -177,26 +204,24 @@ exports.setRecord = async(req, res) => {
     //buscar si existe el registro
     Respuestas.findOne({
             where: {
-                [Op.and]: [{ id: req.body.request.dataPack.id }, {
-                    id: {
-                        [Op.gt]: 0
-                    }
+                [Op.and]: [{ id_proyectos: dataPack.id_proyectos }, {
+                    id_catpreguntas: dataPack.id_catpreguntas
                 }],
             }
         })
         .then(respuestas => {
             if (!respuestas) {
-                delete req.body.request.dataPack.id;
-                delete req.body.request.dataPack.created_at;
-                delete req.body.request.dataPack.updated_at;
-                req.body.request.dataPack.id_usuarios_r = req.userId;
-                req.body.request.dataPack.state = globales.GetStatusSegunAccion(req.body.request.actionForm);
+                delete dataPack.id;
+                delete dataPack.created_at;
+                delete dataPack.updated_at;
+                dataPack.id_usuarios_r = dataPack.id_usuarios;
+                dataPack.state = globales.GetStatusSegunAccion("editar");
 
                 Respuestas.create(
-                    req.body.request.dataPack
+                    dataPack
                 ).then((self) => {
                     // here self is your instance, but updated
-                    res.status(200).send(
+                    return(
                         { 
                             codigo:"00200",
                             mensaje: "",
@@ -205,7 +230,7 @@ exports.setRecord = async(req, res) => {
                                     }
                         })
                 }).catch(err => {
-                    res.status(200).send(
+                    return(
                         { 
                             codigo:"00400",
                             mensaje: err,
@@ -214,14 +239,14 @@ exports.setRecord = async(req, res) => {
                         });
                 });
             } else {
-                delete req.body.request.dataPack.created_at;
-                delete req.body.request.dataPack.updated_at;
-                req.body.request.dataPack.id_usuarios_r = req.userId;
-                req.body.request.dataPack.state = globales.GetStatusSegunAccion(req.body.request.actionForm);
+                delete dataPack.created_at;
+                delete dataPack.updated_at;
+                dataPack.id_usuarios_r = dataPack.id_usuarios;
+                dataPack.state = globales.GetStatusSegunAccion("editar");
 
-                respuestas.update(req.body.request.dataPack).then((self) => {
+                respuestas.update(dataPack).then((self) => {
                     // here self is your instance, but updated
-                    res.status(200).send(
+                    return(
                         { 
                             codigo:"00200",
                             mensaje: "",
@@ -231,11 +256,9 @@ exports.setRecord = async(req, res) => {
                         })
                 });
             }
-
-
         })
         .catch(err => {
-            res.status(200).send(
+            return(
                 { 
                     codigo:"00400",
                     mensaje: err.message,
