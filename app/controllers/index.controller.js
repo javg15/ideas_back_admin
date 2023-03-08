@@ -25,6 +25,11 @@ exports.index = (req, res) => {
         case "getmenu": ctrl.user.getMenu(req, res); break;
         case "/catpreguntas/getcuestionario":ctrl.catpreguntas.getCuestionario(req, res); break;
         case "/respuestas/setcuestionario":ctrl.respuestas.setCuestionario(req, res); break;
+        case "/respuestas/getriesgo_percepcion_idea":ctrl.respuestas.getRiesgoPercepcionIdea(req, res); break;
+        case "/respuestas/getriesgo_objetivo_idea":ctrl.respuestas.getRiesgoObjetivoIdea(req, res); break;
+        case "/respuestas/getcreacion_personaje":ctrl.respuestas.getCreacionPersonaje(req, res); break;
+        case "/respuestas/getfoda":ctrl.respuestas.getFODA(req, res); break;
+        case "/respuestas/getcultura":ctrl.respuestas.getCultura(req, res); break;
         default:res.status(200).send(
             { 
                 codigo:"00100",

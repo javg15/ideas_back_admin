@@ -129,6 +129,181 @@ exports.getRegistros = async(req, res) => {
     //return res.status(200).json(data);
     // res.status(500).send({ message: err.message });
 }
+exports.getCultura = async(req, res) => {
+    let datos = "",
+    query = "";
+
+    query = "select public.srep_categorias('&id_proyectos=' || :id_proyectos "
+            + "|| '&id_grafica=' || :id_grafica) as datos";
+
+    datos = await db.sequelize.query(query, {
+        // A function (or false) for logging your queries
+        // Will get called for every SQL query that gets sent
+        // to the server.
+        logging: console.log,
+
+        replacements: {
+            id_proyectos: req.body.request.id_proyectos,
+            id_grafica: 5
+        },
+        // If plain is true, then sequelize will only return the first
+        // record of the result set. In case of false it will return all records.
+        plain: false,
+
+        // Set this to true if you don't have a model definition for your query.
+        raw: true,
+        type: QueryTypes.SELECT
+    });
+
+
+    //console.log(JSON.stringify(respuesta));
+    res.status(200).send({ 
+        codigo:"00200",
+        mensaje: "",
+        response: JSON.parse(datos[0]["datos"])
+            });
+}
+
+exports.getFODA = async(req, res) => {
+    let datos = "",
+    query = "";
+
+    query = "select public.srep_categorias('&id_proyectos=' || :id_proyectos "
+            + "|| '&id_grafica=' || :id_grafica) as datos";
+
+    datos = await db.sequelize.query(query, {
+        // A function (or false) for logging your queries
+        // Will get called for every SQL query that gets sent
+        // to the server.
+        logging: console.log,
+
+        replacements: {
+            id_proyectos: req.body.request.id_proyectos,
+            id_grafica: 4
+        },
+        // If plain is true, then sequelize will only return the first
+        // record of the result set. In case of false it will return all records.
+        plain: false,
+
+        // Set this to true if you don't have a model definition for your query.
+        raw: true,
+        type: QueryTypes.SELECT
+    });
+
+
+    //console.log(JSON.stringify(respuesta));
+    res.status(200).send({ 
+        codigo:"00200",
+        mensaje: "",
+        response: JSON.parse(datos[0]["datos"])
+            });
+}
+
+exports.getCreacionPersonaje = async(req, res) => {
+    let datos = "",
+    query = "";
+
+    query = "select public.srep_categorias('&id_proyectos=' || :id_proyectos "
+            + "|| '&id_grafica=' || :id_grafica) as datos";
+
+    datos = await db.sequelize.query(query, {
+        // A function (or false) for logging your queries
+        // Will get called for every SQL query that gets sent
+        // to the server.
+        logging: console.log,
+
+        replacements: {
+            id_proyectos: req.body.request.id_proyectos,
+            id_grafica: 3
+        },
+        // If plain is true, then sequelize will only return the first
+        // record of the result set. In case of false it will return all records.
+        plain: false,
+
+        // Set this to true if you don't have a model definition for your query.
+        raw: true,
+        type: QueryTypes.SELECT
+    });
+
+
+    //console.log(JSON.stringify(respuesta));
+    res.status(200).send({ 
+        codigo:"00200",
+        mensaje: "",
+        response: JSON.parse(datos[0]["datos"])
+            });
+}
+
+exports.getRiesgoObjetivoIdea = async(req, res) => {
+    let datos = "",
+    query = "";
+
+    query = "select public.srep_categorias('&id_proyectos=' || :id_proyectos "
+            + "|| '&id_grafica=' || :id_grafica) as datos";
+
+    datos = await db.sequelize.query(query, {
+        // A function (or false) for logging your queries
+        // Will get called for every SQL query that gets sent
+        // to the server.
+        logging: console.log,
+
+        replacements: {
+            id_proyectos: req.body.request.id_proyectos,
+            id_grafica: 2
+        },
+        // If plain is true, then sequelize will only return the first
+        // record of the result set. In case of false it will return all records.
+        plain: false,
+
+        // Set this to true if you don't have a model definition for your query.
+        raw: true,
+        type: QueryTypes.SELECT
+    });
+
+
+    //console.log(JSON.stringify(respuesta));
+    res.status(200).send({ 
+        codigo:"00200",
+        mensaje: "",
+        response: JSON.parse(datos[0]["datos"])
+            });
+}
+
+exports.getRiesgoPercepcionIdea = async(req, res) => {
+    let datos = "",
+    query = "";
+
+    query = "select public.srep_categorias('&id_proyectos=' || :id_proyectos "
+            + "|| '&id_grafica=' || :id_grafica) as datos";
+
+    datos = await db.sequelize.query(query, {
+        // A function (or false) for logging your queries
+        // Will get called for every SQL query that gets sent
+        // to the server.
+        logging: console.log,
+
+        replacements: {
+            id_proyectos: req.body.request.id_proyectos,
+            id_grafica: 1
+        },
+        // If plain is true, then sequelize will only return the first
+        // record of the result set. In case of false it will return all records.
+        plain: false,
+
+        // Set this to true if you don't have a model definition for your query.
+        raw: true,
+        type: QueryTypes.SELECT
+    });
+
+
+    //console.log(JSON.stringify(respuesta));
+    res.status(200).send({ 
+        codigo:"00200",
+        mensaje: "",
+        response: JSON.parse(datos[0]["datos"])
+            });
+}
+
 
 exports.setCuestionario = async(req, res) => {
 
