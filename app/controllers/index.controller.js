@@ -6,18 +6,6 @@ ctrl.catpreguntas = require("../controllers/catpreguntas.controller.js");
 ctrl.respuestas = require("../controllers/respuestas.controller.js");
 
 exports.index = (req, res) => {
-    /*{
-    uid: '321654656',
-    usuario: 'bvelasco',
-    fecha: '01/01/2023',
-    accion: 'autenticacion',
-    request: {
-          user: 'bvelasco',
-          pass: '1233456'
-     }
-    }
-     */
-    //res.status(200).send("hola");
 
     switch(req.body.metodo.toLowerCase()){
         case "signup": ctrl.auth.signup(req, res); break;

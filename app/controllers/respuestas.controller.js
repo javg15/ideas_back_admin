@@ -311,134 +311,129 @@ exports.setCuestionario = async(req, res) => {
     const id_proyectos=req.body.request.id_proyectos
     const id_usuarios=req.body.id_usuarios
     let dataPack=""; 
+    let respuesta="";
 
     for(let i=0;i<resArr.length;i++){
         dataPack={
             "id_usuarios":id_usuarios,
             "id_proyectos":id_proyectos,
-            "id_catpreguntas":resArr[i].id_catpreguntas,
+            "id_catpreguntas":resArr[i].id_preguntas,
             "respuesta":JSON.stringify(resArr[i].respuesta),
         }
-        this.setRecord(dataPack)
+        this.setRecord(dataPack).then((respuesta)=>{
+            if(respuesta.codigo!="00200")
+                res.status(200).send( respuesta);
+            if(i==resArr.length-1)
+                res.status(200).send( respuesta);
+        })
     }
-
-     //console.log(JSON.stringify(respuesta));
-    res.status(200).send( { 
-        codigo:"00200",
-        mensaje: "",
-        response: {
-                   
-                }
-            }
-        );
-    //return res.status(200).json(data);
-    // res.status(500).send({ message: err.message });
 }
 
-exports.setRecord = async(dataPack) => {
-    Object.keys(dataPack).forEach(function(key) {
-        if (key.indexOf("id_", 0) >= 0) {
-            if (dataPack[key] != '')
-                dataPack[key] = parseInt(dataPack[key]);
-        }
-    })
-
-    /* customer validator shema */
-    const dataVSchema = {
-        /*first_name: { type: "string", min: 1, max: 50, pattern: namePattern },*/
-    };
-
-    var vres = true;
-    vres = await dataValidator.validate(dataPack, dataVSchema);
-
-    /* validation failed */
-    if (!(vres === true)) {
-        let errors = {},
-            item;
-
-        for (const index in vres) {
-            item = vres[index];
-
-            errors[item.field] = item.message;
-        }
-
-        res.status(200).send(
-            { 
-                codigo:"00400",
-                mensaje: errors,
-                response: {
-                        }
-            });
-        return;
-        /*throw {
-            name: "ValidationError",
-            message: errors
-        };*/
-    }
-
-    //buscar si existe el registro
-    Respuestas.findOne({
-            where: {
-                [Op.and]: [{ id_proyectos: dataPack.id_proyectos }, {
-                    id_catpreguntas: dataPack.id_catpreguntas
-                }],
+exports.setRecord =  (dataPack) => {
+    return new Promise(async (Resolve, reject) => {
+        Object.keys(dataPack).forEach(function(key) {
+            if (key.indexOf("id_", 0) >= 0) {
+                if (dataPack[key] != '')
+                    dataPack[key] = parseInt(dataPack[key]);
             }
         })
-        .then(respuestas => {
-            if (!respuestas) {
-                delete dataPack.id;
-                delete dataPack.created_at;
-                delete dataPack.updated_at;
-                dataPack.id_usuarios_r = dataPack.id_usuarios;
-                dataPack.state = globales.GetStatusSegunAccion("editar");
 
-                Respuestas.create(
-                    dataPack
-                ).then((self) => {
-                    // here self is your instance, but updated
-                    return(
-                        { 
-                            codigo:"00200",
-                            mensaje: "",
-                            response: {
-                                        id: self.id,
-                                    }
-                        })
-                }).catch(err => {
-                    return(
-                        { 
-                            codigo:"00400",
-                            mensaje: err,
-                            response: {
-                                    }
-                        });
-                });
-            } else {
-                delete dataPack.created_at;
-                delete dataPack.updated_at;
-                dataPack.id_usuarios_r = dataPack.id_usuarios;
-                dataPack.state = globales.GetStatusSegunAccion("editar");
+        /* customer validator shema */
+        const dataVSchema = {
+            /*first_name: { type: "string", min: 1, max: 50, pattern: namePattern },*/
+        };
 
-                respuestas.update(dataPack).then((self) => {
-                    // here self is your instance, but updated
-                    return(
-                        { 
-                            codigo:"00200",
-                            mensaje: "",
-                            response: {
-                                        id: self.id,
-                                    }
-                        })
-                });
+        var vres = true;
+        vres = await dataValidator.validate(dataPack, dataVSchema);
+
+        /* validation failed */
+        if (!(vres === true)) {
+            let errors = {},
+                item;
+
+            for (const index in vres) {
+                item = vres[index];
+
+                errors[item.field] = item.message;
             }
-        })
-        .catch(err => {
-            return(
+
+            Resolve(
                 { 
                     codigo:"00400",
-                    mensaje: err.message,
+                    mensaje: errors,
                     response: {
                             }
                 });
-        });
+            /*throw {
+                name: "ValidationError",
+                message: errors
+            };*/
+        }
+        
+        //buscar si existe el registro
+        Respuestas.findOne({
+                where: {
+                    [Op.and]: [{ id_proyectos: dataPack.id_proyectos }, {
+                        id_catpreguntas: dataPack.id_catpreguntas
+                    }],
+                }
+            })
+            .then(respuestas => {
+                if (!respuestas) {
+                    delete dataPack.id;
+                    delete dataPack.created_at;
+                    delete dataPack.updated_at;
+                    dataPack.id_usuarios_r = dataPack.id_usuarios;
+                    dataPack.state = globales.GetStatusSegunAccion("editar");
+
+                    Respuestas.create(
+                        dataPack
+                    ).then((self) => {
+                        // here self is your instance, but updated
+                        Resolve(
+                            { 
+                                codigo:"00200",
+                                mensaje: "",
+                                response: {
+                                            id: self.id,
+                                        }
+                            })
+                    }).catch(err => {
+                        Resolve(
+                            { 
+                                codigo:"00400",
+                                mensaje: err,
+                                response: {
+                                        }
+                            });
+                    });
+                } else {
+                    delete dataPack.created_at;
+                    delete dataPack.updated_at;
+                    dataPack.id_usuarios_r = dataPack.id_usuarios;
+                    dataPack.state = globales.GetStatusSegunAccion("editar");
+
+                    respuestas.update(dataPack).then((self) => {
+                        // here self is your instance, but updated
+                        Resolve(
+                            { 
+                                codigo:"00200",
+                                mensaje: "",
+                                response: {
+                                            id: self.id,
+                                        }
+                            })
+                    });
+                }
+            })
+            .catch(err => {
+                Resolve(
+                    { 
+                        codigo:"00400",
+                        mensaje: err.message,
+                        response: {
+                                }
+                    });
+            });
+    })
 }
