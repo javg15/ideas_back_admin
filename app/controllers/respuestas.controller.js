@@ -92,9 +92,9 @@ exports.getRegistros = async(req, res) => {
     + "    left join respuestas r on p.id =r.id_proyectos "
     + "    left join catpreguntas c on r.id_catpreguntas =c.id "
     + "    left join catseccioncuest cs on c.id_catseccioncuest =cs.id  "
-    + "WHERE p.id_usuarios = :id_usuarios "
-    + "    and p.id =:id_proyectos "
-    + "    and cs.id_cuestionario =:id_cuestionario "
+    + "WHERE (p.id_usuarios = :id_usuarios OR COALESCE(:id_usuarios,0)=0) "
+    + "    and (p.id =:id_proyectos OR COALESCE(:id_proyectos,0)=0) "
+    + "    and (cs.id_cuestionario =:id_cuestionario  OR COALESCE(:id_cuestionario,0)=0) "
     + "    and p.state IN('A','B')";
 
     datos = await db.sequelize.query(query, {
@@ -133,7 +133,7 @@ exports.getCultura = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select public.srep_categorias('&id_proyectos=' || :id_proyectos "
+    query = "select public.srep_respuestas('&id_proyectos=' || :id_proyectos "
             + "|| '&id_grafica=' || :id_grafica) as datos";
 
     datos = await db.sequelize.query(query, {
@@ -168,7 +168,7 @@ exports.getFODA = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select public.srep_categorias('&id_proyectos=' || :id_proyectos "
+    query = "select public.srep_respuestas('&id_proyectos=' || :id_proyectos "
             + "|| '&id_grafica=' || :id_grafica) as datos";
 
     datos = await db.sequelize.query(query, {
@@ -203,7 +203,7 @@ exports.getCreacionPersonaje = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select public.srep_categorias('&id_proyectos=' || :id_proyectos "
+    query = "select public.srep_respuestas('&id_proyectos=' || :id_proyectos "
             + "|| '&id_grafica=' || :id_grafica) as datos";
 
     datos = await db.sequelize.query(query, {
@@ -238,7 +238,7 @@ exports.getRiesgoObjetivoIdea = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select public.srep_categorias('&id_proyectos=' || :id_proyectos "
+    query = "select public.srep_respuestas('&id_proyectos=' || :id_proyectos "
             + "|| '&id_grafica=' || :id_grafica) as datos";
 
     datos = await db.sequelize.query(query, {
@@ -273,7 +273,7 @@ exports.getRiesgoPercepcionIdea = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select public.srep_categorias('&id_proyectos=' || :id_proyectos "
+    query = "select public.srep_respuestas('&id_proyectos=' || :id_proyectos "
             + "|| '&id_grafica=' || :id_grafica) as datos";
 
     datos = await db.sequelize.query(query, {
@@ -314,18 +314,25 @@ exports.setCuestionario = async(req, res) => {
     let respuesta="";
 
     for(let i=0;i<resArr.length;i++){
-        dataPack={
-            "id_usuarios":id_usuarios,
-            "id_proyectos":id_proyectos,
-            "id_catpreguntas":resArr[i].id_preguntas,
-            "respuesta":JSON.stringify(resArr[i].respuesta),
+        if(resArr[i].id_preguntas!='undefined'
+            && resArr[i].id_preguntas!=undefined
+            && resArr[i].id_preguntas!=null){
+
+                dataPack={
+                    "id_usuarios":id_usuarios,
+                    "id_proyectos":id_proyectos,
+                    "id_catpreguntas":resArr[i].id_preguntas,
+                    "respuesta":JSON.stringify(resArr[i].respuesta),
+                }
+                this.setRecord(dataPack).then((respuesta)=>{
+                    if(respuesta.codigo!="00200")
+                        res.status(200).send( respuesta);
+                    if(i==resArr.length-1)
+                        res.status(200).send( respuesta);
+                })
         }
-        this.setRecord(dataPack).then((respuesta)=>{
-            if(respuesta.codigo!="00200")
-                res.status(200).send( respuesta);
-            if(i==resArr.length-1)
-                res.status(200).send( respuesta);
-        })
+
+        
     }
 }
 

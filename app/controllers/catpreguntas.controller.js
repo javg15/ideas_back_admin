@@ -124,10 +124,12 @@ exports.getCuestionario = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select cp.id,cp.estructura,cs.estructura as seccion  "
+    query = "select cp.id,cp.estructura,cs.estructura as seccion,cp.valor  "
     + "from catpreguntas cp "
     + "    left join catseccioncuest cs on cp.id_catseccioncuest=cs.id "
-    + "where cs.id_cuestionario =:id_cuestionario and cp.state IN('A','B') "
+    + "where (cs.id_cuestionario=COALESCE(:id_cuestionario,0) OR COALESCE(:id_cuestionario,0)=0) "
+    + "     and (cs.id=COALESCE(:id_seccion,0) OR COALESCE(:id_seccion,0)=0) "
+    + "     and cp.state IN('A','B') "
     + "order by cp.id_catseccioncuest, cp.orden ";
 
     datos = await db.sequelize.query(query, {
@@ -138,6 +140,7 @@ exports.getCuestionario = async(req, res) => {
 
         replacements: {
             id_cuestionario: req.body.request.id_cuestionario,
+            id_seccion: req.body.request.id_seccion,
         },
         // If plain is true, then sequelize will only return the first
         // record of the result set. In case of false it will return all records.
