@@ -124,7 +124,7 @@ exports.getCuestionario = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select cp.id,cp.estructura,cs.estructura as seccion,cp.valor  "
+    query = "select cp.id,cp.estructura,cs.estructura as seccion,cp.valor,cp.input  "
     + "from catpreguntas cp "
     + "    left join catseccioncuest cs on cp.id_catseccioncuest=cs.id "
     + "where (cs.id_cuestionario=COALESCE(:id_cuestionario,0) OR COALESCE(:id_cuestionario,0)=0) "
