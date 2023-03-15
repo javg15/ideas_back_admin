@@ -18,6 +18,8 @@ exports.index = (req, res) => {
         case "/respuestas/getcreacion_personaje":ctrl.respuestas.getCreacionPersonaje(req, res); break;
         case "/respuestas/getfoda":ctrl.respuestas.getFODA(req, res); break;
         case "/respuestas/getcultura":ctrl.respuestas.getCultura(req, res); break;
+        case "/respuestas/getvalores":ctrl.respuestas.getValores(req, res); break;
+        case "/respuestas/getvision":ctrl.respuestas.getVision(req, res); break;
         default:res.status(200).send(
             { 
                 codigo:"00100",
