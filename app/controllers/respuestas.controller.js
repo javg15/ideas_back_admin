@@ -133,7 +133,7 @@ exports.getCultura = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select public.srep_respuestas('&id_proyectos=' || :id_proyectos "
+    query = "select public.srep_ideacion('&id_proyectos=' || :id_proyectos "
             + "|| '&id_grafica=' || :id_grafica) as datos";
 
     datos = await db.sequelize.query(query, {
@@ -168,7 +168,7 @@ exports.getFODA = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select public.srep_respuestas('&id_proyectos=' || :id_proyectos "
+    query = "select public.srep_ideacion('&id_proyectos=' || :id_proyectos "
             + "|| '&id_grafica=' || :id_grafica) as datos";
 
     datos = await db.sequelize.query(query, {
@@ -203,7 +203,7 @@ exports.getCreacionPersonaje = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select public.srep_respuestas('&id_proyectos=' || :id_proyectos "
+    query = "select public.srep_ideacion('&id_proyectos=' || :id_proyectos "
             + "|| '&id_grafica=' || :id_grafica) as datos";
 
     datos = await db.sequelize.query(query, {
@@ -238,7 +238,7 @@ exports.getRiesgoObjetivoIdea = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select public.srep_respuestas('&id_proyectos=' || :id_proyectos "
+    query = "select public.srep_ideacion('&id_proyectos=' || :id_proyectos "
             + "|| '&id_grafica=' || :id_grafica) as datos";
 
     datos = await db.sequelize.query(query, {
@@ -269,11 +269,11 @@ exports.getRiesgoObjetivoIdea = async(req, res) => {
             });
 }
 
-exports.getRiesgoPercepcionIdea = async(req, res) => {
+exports.getIdeacion = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select public.srep_respuestas('&id_proyectos=' || :id_proyectos "
+    query = "select public.srep_ideacion('&id_proyectos=' || :id_proyectos "
             + "|| '&id_grafica=' || :id_grafica) as datos";
 
     datos = await db.sequelize.query(query, {
@@ -284,7 +284,7 @@ exports.getRiesgoPercepcionIdea = async(req, res) => {
 
         replacements: {
             id_proyectos: req.body.request.id_proyectos,
-            id_grafica: 1
+            id_grafica: req.body.request.id_grafica
         },
         // If plain is true, then sequelize will only return the first
         // record of the result set. In case of false it will return all records.
@@ -308,7 +308,7 @@ exports.getValores = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select public.srep_respuestas('&id_proyectos=' || :id_proyectos "
+    query = "select public.srep_ideacion('&id_proyectos=' || :id_proyectos "
             + "|| '&id_grafica=' || :id_grafica) as datos";
 
     datos = await db.sequelize.query(query, {
@@ -343,7 +343,7 @@ exports.getVision = async(req, res) => {
     let datos = "",
     query = "";
 
-    query = "select public.srep_respuestas('&id_proyectos=' || :id_proyectos "
+    query = "select public.srep_ideacion('&id_proyectos=' || :id_proyectos "
             + "|| '&id_grafica=' || :id_grafica) as datos";
 
     datos = await db.sequelize.query(query, {
@@ -355,6 +355,41 @@ exports.getVision = async(req, res) => {
         replacements: {
             id_proyectos: req.body.request.id_proyectos,
             id_grafica: 6
+        },
+        // If plain is true, then sequelize will only return the first
+        // record of the result set. In case of false it will return all records.
+        plain: false,
+
+        // Set this to true if you don't have a model definition for your query.
+        raw: true,
+        type: QueryTypes.SELECT
+    });
+
+
+    //console.log(JSON.stringify(respuesta));
+    res.status(200).send({ 
+        codigo:"00200",
+        mensaje: "",
+        response: JSON.parse(datos[0]["datos"])
+            });
+}
+
+exports.getProductoNombre = async(req, res) => {
+    let datos = "",
+    query = "";
+
+    query = "select public.srep_productogenerales('&id_proyectos=' || :id_proyectos "
+            + "|| '&seccion=' || :seccion) as datos";
+
+    datos = await db.sequelize.query(query, {
+        // A function (or false) for logging your queries
+        // Will get called for every SQL query that gets sent
+        // to the server.
+        logging: console.log,
+
+        replacements: {
+            id_proyectos: req.body.request.id_proyectos,
+            id_catseccioncuest: req.body.request.id_catseccioncuest,
         },
         // If plain is true, then sequelize will only return the first
         // record of the result set. In case of false it will return all records.
