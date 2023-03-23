@@ -9,8 +9,11 @@ module.exports = function(app) {
         );
         next();
     });
-    app.post(
-        "/api/index", //[authJwt.verifyToken],
+    app.post("/api/index", [authJwt.verifyToken],
+        controller.index
+    );
+    app.post("/api/signin", 
+        //[authJwt.verifyToken],
         controller.index
     );
 };

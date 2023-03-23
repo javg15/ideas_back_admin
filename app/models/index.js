@@ -23,7 +23,7 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 //historial de plazas segun sistema de nomina
-
+db.refreshToken = require("./refreshtoken.model.js")(sequelize, Sequelize);
 db.user = require("../models/user.model.js")(sequelize, Sequelize);
 db.usuarios_zonas = require("../models/usuarios_zonas.model.js")(sequelize, Sequelize);
 db.usuarios_sistemas = require("../models/usuarios_sistemas.model.js")(sequelize, Sequelize);

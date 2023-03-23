@@ -10,6 +10,7 @@ exports.index = (req, res) => {
     switch(req.body.metodo.toLowerCase()){
         case "signup": ctrl.auth.signup(req, res); break;
         case "signin": ctrl.auth.signin(req, res); break;
+        case "refreshtoken": ctrl.auth.refreshToken(req, res); break;
         case "getmenu": ctrl.user.getMenu(req, res); break;
         case "/catpreguntas/getcuestionario":ctrl.catpreguntas.getCuestionario(req, res); break;
         case "/respuestas/setcuestionario":ctrl.respuestas.setCuestionario(req, res); break;

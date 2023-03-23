@@ -1,7 +1,6 @@
 const db = require("../models");
 const config = require("../config/auth.config");
-const User = db.user;
-
+const { user: User,  refreshToken: RefreshToken  } = db;
 const Op = db.Sequelize.Op;
 
 var jwt = require("jsonwebtoken");
@@ -20,7 +19,7 @@ exports.signup = (req, res) => {
         })
         .then(user => {
             res.send({ 
-                codigo:"00400",
+                codigo:"00200",
                 mensaje: "Usuario registrado correctamente",
                 response: {
                 }
@@ -30,17 +29,17 @@ exports.signup = (req, res) => {
             let mensaje="";
             if(err.original.code=="23505")
                 mensaje="El nombre de usuario ya existe"
-                
+
             res.status(200).send({ 
                 codigo:"00400",
-                mensaje: mensaje,
+                mensaje: mensaje,//err.original,
                 response: {
                 }
              });
         });
 };
 
-exports.signin = (req, res) => {
+exports.signin =  (req, res) => {
     const param = {};
     param.username=req.body.request.user
     param.password=req.body.request.pass
@@ -50,7 +49,7 @@ exports.signin = (req, res) => {
                 username: param.username
             }
         })
-        .then(user => {
+        .then(async (user) => {
             if (!user) {
                 return res.status(200).send({ 
                         codigo:"00400",
@@ -74,9 +73,11 @@ exports.signin = (req, res) => {
                  });
             }
 
-            var token = jwt.sign({ id: user.id }, config.secret, {
-                expiresIn: 86400 // 24 hours
-            });
+            const token = jwt.sign({ id: user.id }, config.secret, {
+                expiresIn: config.jwtExpiration
+              });
+            
+            let refreshToken = await RefreshToken.createToken(user);
 
             var authorities = [];
             /*for (let i = 0; i < roles.length; i++) {
@@ -91,7 +92,8 @@ exports.signin = (req, res) => {
                         username: user.username,
                         email: user.email,
                         roles: authorities,
-                        accessToken: token
+                        accessToken: token,
+                        refreshToken: refreshToken,
                     }
                 }
             );
@@ -106,3 +108,74 @@ exports.signin = (req, res) => {
                  });
         });
 };
+
+exports.refreshToken = async (req, res) => {
+    const { refreshToken: requestToken } = req.body;
+  
+    if (requestToken == null) {
+        res.status(200).send(
+            { 
+                codigo:"00400",
+                mensaje: "Refresh Token is required!",
+                response: {
+                }
+             });
+    }
+  
+    try {
+      let refreshToken = await RefreshToken.findOne({ where: { token: requestToken } });
+  
+      //console.log(refreshToken)
+  
+      if (!refreshToken) {
+        res.status(200).send(
+            { 
+                codigo:"00400",
+                mensaje: "Refresh token is not in database!",
+                response: {
+                }
+             });
+        return;
+      }
+  
+      if (RefreshToken.verifyExpiration(refreshToken)) {
+        RefreshToken.destroy({ where: { id: refreshToken.id } });
+        
+        res.status(200).send(
+            { 
+                codigo:"00400",
+                mensaje: "Refresh token was expired. Please make a new signin request",
+                response: {
+                }
+             });
+
+        return;
+      }
+  
+      const user = await refreshToken.getUser();
+      let newAccessToken = jwt.sign({ id: user.id }, config.secret, {
+        expiresIn: config.jwtExpiration,
+      });
+  
+      return res.status(200).send(
+        { 
+            codigo:"00200",
+            mensaje: "Refresh token was expired. Please make a new signin request",
+            response: {
+                accessToken: newAccessToken,
+                refreshToken: refreshToken.token,
+            }
+         });
+
+    } catch (err) {
+        return res.status(200).send(
+            { 
+                codigo:"00500",
+                mensaje: err,
+                response: {
+                    accessToken: newAccessToken,
+                    refreshToken: refreshToken.token,
+                }
+             });
+    }
+  };
