@@ -35,5 +35,6 @@ db.permgrupos = require("../models/permgrupos.model.js")(sequelize, Sequelize);
 db.permgruposmodulos = require("../models/permgruposmodulos.model.js")(sequelize, Sequelize);
 db.permusuariosmodulos = require("../models/permusuariosmodulos.model.js")(sequelize, Sequelize);
 db.respuestas = require("../models/respuestas.model.js")(sequelize, Sequelize);
+db.proyectos = require("../models/proyectos.model.js")(sequelize, Sequelize);
 
 module.exports = db;

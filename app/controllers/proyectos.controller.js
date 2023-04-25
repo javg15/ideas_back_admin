@@ -19,15 +19,20 @@ exports.getRecord = async(req, res) => {
 
     Proyectos.findOne({
             where: {
-                id: req.body.id
+                id: req.body.request.id
             }
         })
         .then(proyectos => {
             /*if (!proyectos) {
                 return res.status(200).send({ message: "Proyectos Not found." });
             }*/
-
-            res.status(200).send(proyectos);
+            res.status(200).send({ 
+                codigo:"00200",
+                mensaje: "",
+                response: {
+                    data:proyectos
+                }
+            });
         })
         .catch(err => {
             res.status(500).send({ message: err.message });

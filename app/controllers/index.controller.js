@@ -4,6 +4,7 @@ ctrl.auth = require("../controllers/auth.controller.js");
 ctrl.user = require("../controllers/user.controller.js");
 ctrl.catpreguntas = require("../controllers/catpreguntas.controller.js");
 ctrl.respuestas = require("../controllers/respuestas.controller.js");
+ctrl.proyectos = require("../controllers/proyectos.controller.js");
 
 exports.index = (req, res) => {
 
@@ -16,6 +17,7 @@ exports.index = (req, res) => {
         case "/respuestas/setcuestionario":ctrl.respuestas.setCuestionario(req, res); break;
         case "/respuestas/getideacion":ctrl.respuestas.getIdeacion(req, res); break;
         case "/respuestas/getproducto":ctrl.respuestas.getProducto(req, res); break;
+        case "/proyectos/getrecord":ctrl.proyectos.getRecord(req, res); break;
         default:res.status(200).send(
             { 
                 codigo:"00100",
